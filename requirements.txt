@@ -1,0 +1,13 @@
+tensorflow
+opencv-python
+numpy
+Cython
+codecov
+pytest-cov
+pytesseract
+tesseract-ocr
+wand
+sklearn
+imutils
+matplotlib
+PIL
