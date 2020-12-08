@@ -21,7 +21,7 @@ import os
 
 print('[INFO] Carregando imagens ...')
 #carregando imagens
-caminho_imagens = list(paths.list_images('/content/Face-Recognition-Detector-de-Mascara-Python-Covid-19/dataset'))
+caminho_imagens = list(paths.list_images('/dataset/'))
 
 imagens = []
 labels = []
