@@ -6,28 +6,62 @@ import cv2
 import os
 import sys
 
+def salva_img(img,path):
+    paths = path.split("/")
+    if paths != path:
+        new_path = paths[-1].split(".")
+        new_path[-2] += ".det"
+        
+        path_f = ""
+        for s in new_path:
+            path_f += s + "."
+
+        path_f = path_f[:-1]
+
+        diretorio = ""
+
+        for i in range(0, len(paths)-1):
+            diretorio += paths[i]+"/"
+
+        print(f"[ INFO ] Salvando imagem em: {diretorio+path_f}")
+        cv2.imwrite(str(diretorio+path_f), img)
+    else:
+        new_path = paths.split(".")
+        new_path[-2] += ".det"
+        
+        path_f = ""
+        for s in new_path:
+            path_f += s
+
+        cv2.imwrite(path_f, img)
+    
 
 # carrega modelo de detector de rosto serializado a partir do disco
-print("[INFO] carregando modelo detector de faces...")
+print("[ INFO ] carregando modelo detector de faces...")
 prototxtPath = os.path.sep.join(["classificadores/deploy.prototxt"])
 weightsPath = os.path.sep.join(	["classificadores/res10_300x300_ssd_iter_140000.caffemodel"])
 net = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # carregar o modelo do detector de máscara facial a partir do disco
-print("[INFO] carregando modelo...")
+print("[ INFO ] carregando modelo...")
 modelo = load_model("classificadores/mask_detector.model")
 
 #carrega a imagem
 
-print("[INFO] carregando imagem...")
+print("[ INFO ] carregando imagem...")
 
+path = ""
+save = False
+if "-s" in sys.argv:
+    save = True
+    sys.argv.remove("-s")
 if len(sys.argv) > 1:
     if sys.argv[1] == "-i":
         path = sys.argv[2]
     else:
         print('Insira um argumento valido')
 else:
-    path = 'exemplos/3.png'
+    path = "testes/3.png"
 imagem = cv2.imread(path)
 #copiando imagem
 origem = imagem.copy()
@@ -37,7 +71,7 @@ origem = imagem.copy()
 blob = cv2.dnn.blobFromImage(imagem, 1.0, (300, 300), (104.0, 177.0, 123.0))
 # passe o blob pela rede e obtenha as detecções de rosto
 
-print("[INFO] computando deteccoes faciais...")
+print("[ INFO ] computando deteccoes faciais...")
 net.setInput(blob)
 deteccoes = net.forward()
 
@@ -79,5 +113,9 @@ for i in range(0, deteccoes.shape[2]):
         cv2.rectangle(imagem, (startX, startY), (endX, endY), color, 2)
 
 # Mostra a imagem final
+
+if(save == True):
+    salva_img(imagem, path)
+
 cv2.imshow("Janela", imagem)
 cv2.waitKey(0)
