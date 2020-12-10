@@ -1,10 +1,9 @@
-import tensorflow as tf
-from tensorflow import keras
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
-import PIL
-from PIL import Image
 
+from tensorflow import keras
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -20,41 +19,40 @@ from sklearn.metrics import classification_report
 import os
 
 print('[INFO] Carregando imagens ...')
-#carregando imagens
-caminho_imagens = list(paths.list_images('/dataset/'))
 
-imagens = []
-labels = []
-#pegando o label e a imagem e add em listas
-for path in caminho_imagens:
+caminho_imagens = list(paths.list_images('/dataset/')) # Carregando imagens
+
+imagens = [] # Lista de imagens
+labels = []  # Lista de labels
+
+for path in caminho_imagens: # Pegando o label e a imagem e add em listas
     label = path.split(os.path.sep)[-2]
-    #abrindo e processando as imagens
-    imagem = load_img(path, target_size=(224, 224))
-    imagem = img_to_array(imagem)
+
+    imagem = load_img(path, target_size=(224, 224)) # Abrindo e processando as imagens
+    imagem = img_to_array(imagem) # Convertendo a imagem para array
     imagem = preprocess_input(imagem)
 
-    imagens.append(imagem)
-    labels.append(label)
+    imagens.append(imagem) # Adicionando imagem a lista de imagens
+    labels.append(label) # Adicionando label a lista de labels
 
-#transformando em array numpy
-imagens = np.array(imagens, dtype='float32')
+
+imagens = np.array(imagens, dtype='float32') # Transformando as listas em array numpy
 labels = np.array(labels)
 
-# executar codificação one-hot nas etiquetas
-lb = LabelBinarizer()
+lb = LabelBinarizer() # Executar codificação one-hot nas etiquetas
 labels = lb.fit_transform(labels)
 labels = to_categorical(labels)
 
-# particione os dados em divisões de treinamento e teste usando 75% dos dados para treinamento e os 25% restantes para teste
+# Particione os dados em divisões de treinamento e teste usando 75% dos dados para treinamento e os 25% restantes para teste
 (trainX, testX, trainY, testY) = train_test_split(imagens, labels, test_size=0.20, stratify=labels, random_state=42)
 
-# construindo o gerador de imagens de treinamento para aumento de dados
+# Construindo o gerador de imagens de treinamento para aumento de dados
 gerador = ImageDataGenerator(rotation_range=20, zoom_range=0.15, width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15, horizontal_flip=True, fill_mode="nearest")
 
-# carregando a rede MobileNetV2, garantindo que os conjuntos de camadas FC principais sejam deixados de lado
+# Carregando a rede MobileNetV2, garantindo que os conjuntos de camadas FC principais sejam deixados de lado
 baseModel = MobileNetV2(weights="imagenet", include_top=False, input_tensor=keras.layers.Input(shape=(224, 224, 3)))
 
-# construindo a cabeça do modelo que será colocado em cima do modelo base
+# Construindo a cabeça do modelo que será colocado em cima do modelo base
 modelo_cabeca = baseModel.output
 modelo_cabeca = keras.layers.AveragePooling2D(pool_size=(7, 7))(modelo_cabeca)
 modelo_cabeca = keras.layers.Flatten(name="flatten")(modelo_cabeca)
@@ -62,41 +60,41 @@ modelo_cabeca = keras.layers.Dense(128, activation="relu")(modelo_cabeca)
 modelo_cabeca = keras.layers.Dropout(0.5)(modelo_cabeca)
 modelo_cabeca = keras.layers.Dense(2, activation="softmax")(modelo_cabeca)
 
-#criando o modelo principal sobre o base
+# Criando o modelo principal sobre o base
 modelo = Model(inputs=baseModel.input, outputs=modelo_cabeca)
 
-# percorre todas as camadas no modelo base e as congela para que elas * não * sejam atualizadas durante o primeiro processo de treinamento
+# Percorre todas as camadas no modelo base e as congela para que elas * não * sejam atualizadas durante o primeiro processo de treinamento
 for layer in baseModel.layers:
 	  layer.trainable = False
 
-#compilando o modelo
+# Compilando o modelo
 print('[INFO] compilando modelo ...')
 
 modelo.compile(optimizer='adam', loss='binary_crossentropy',metrics=['accuracy'])
 
-# inicialize a taxa de aprendizado inicial, número de épocas para treinamento e tamanho do lote
+# Inicialize a taxa de aprendizado inicial, número de épocas para treinamento e tamanho do lote
 inicia_apredizado = 1e-4
-quantidade_treinos = 30
+quantidade_treinos = 110
 tamanho_lote = 32
 
-# treinar a cabeça
+# Treinar a cabeça
 print("[INFO] treinando...")
 cabeca = modelo.fit(gerador.flow(trainX, trainY, batch_size=tamanho_lote), steps_per_epoch=len(trainX) // tamanho_lote, validation_data=(testX, testY), validation_steps=len(testX) // tamanho_lote, epochs=quantidade_treinos)
 
-# fazendo predições na rede neural
+# Fazendo predições na rede neural
 print("[INFO] avaliando a rede neural...")
 predIdxs = modelo.predict(testX, batch_size=tamanho_lote)
 
-# para cada imagem no conjunto de testes, precisamos encontrar o índice do rótulo com a maior probabilidade prevista correspondente
+# Para cada imagem no conjunto de testes, precisamos encontrar o índice do rótulo com a maior probabilidade prevista correspondente
 predIdxs = np.argmax(predIdxs, axis=1)
 
 print(classification_report(testY.argmax(axis=1), predIdxs,	target_names=lb.classes_))
 
-# salvando o modelo
+# Salvando o modelo
 print("[INFO] salvando o modelo...")
 modelo.save("mask_detector.model", save_format="h5")
 
-# traçar a perda e a precisão do treinamento
+# Traçar a perda e a precisão do treinamento
 N = quantidade_treinos
 plt.style.use("ggplot")
 plt.figure()
