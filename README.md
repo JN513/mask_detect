@@ -2,9 +2,8 @@
 
 Sistema feito para detecção facial e reconhecimento se a pessoa esta usando mascara ou não, atraves de Visão computacional, Machine larning e deep larning.
 
-<div class="d-flex justify-content-center">
-    ![Imagem de pessoas com e sem mascaras faciais](https://raw.githubusercontent.com/JN513/mask_detect/master/testes/teste.det.jpg)
-</div>
+![Imagem de pessoas com e sem mascaras faciais](https://raw.githubusercontent.com/JN513/mask_detect/master/testes/teste.det.jpg)
+
 ## Requisitos
 
 * Versão 3.0 ou superior do Python (testei na 3.8)
