@@ -6,6 +6,12 @@ import cv2
 import os
 import sys
 
+def make_help():
+    print("\nArgumentos disponiveis:\n")
+    print("    -s -> Para salvar a imagem")
+    print("    -i -> para passar a imagem, necessita do path da imagem como proximo argumento")
+    print("    -h or --help -> ajuda")
+
 def salva_img(img,path):
     paths = path.split("/")
     if paths != path:
@@ -35,6 +41,7 @@ def salva_img(img,path):
 
         cv2.imwrite(path_f, img)
     
+os.system("clear || cls")
 
 # carrega modelo de detector de rosto serializado a partir do disco
 print("[ INFO ] carregando modelo detector de faces...")
@@ -46,12 +53,22 @@ net = cv2.dnn.readNet(prototxtPath, weightsPath)
 print("[ INFO ] carregando modelo...")
 modelo = load_model("classificadores/mask_detector.model")
 
+os.system("clear || cls")
+
 #carrega a imagem
 
 print("[ INFO ] carregando imagem...")
 
 path = ""
 save = False
+help = False
+
+if "-h" in sys.argv:
+    sys.argv.remove("-h")
+    help = True
+if "--help" in sys.argv:
+    sys.argv.remove("--help")
+    help = True
 if "-s" in sys.argv:
     save = True
     sys.argv.remove("-s")
@@ -59,12 +76,21 @@ if len(sys.argv) > 1:
     if sys.argv[1] == "-i":
         path = sys.argv[2]
     else:
-        print('Insira um argumento valido')
+        print('[ INFO ] Insira um argumento valido')
+        sys.exit()
 else:
     path = "testes/3.png"
-imagem = cv2.imread(path)
-#copiando imagem
-origem = imagem.copy()
+
+
+imagem = cv2.imread(path) #lendo imagem
+
+try:
+    origem = imagem.copy() #copiando imagem
+    print("[ INFO ] Imagem aberta")
+except:
+    print("[ INFO ] Imagem não encontrada")
+    sys.exit()
+    
 (h, w) = imagem.shape[:2]
 
 # construir um blob a partir da imagem
@@ -114,8 +140,11 @@ for i in range(0, deteccoes.shape[2]):
 
 # Mostra a imagem final
 
-if(save == True):
+if save == True:
     salva_img(imagem, path)
+
+if help == True:
+    make_help()
 
 cv2.imshow("Janela", imagem)
 cv2.waitKey(0)
