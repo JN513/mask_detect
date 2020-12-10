@@ -12,7 +12,7 @@ def make_help():
     print("    -i -> para passar a imagem, necessita do path da imagem como proximo argumento")
     print("    -h or --help -> ajuda")
 
-def salva_img(img,path):
+def salva_img( img, path ): # Salvo a imagem com um .det antes da extenção para identificar que ela passou pelo detector
     paths = path.split("/")
     if paths != path:
         new_path = paths[-1].split(".")
@@ -30,7 +30,7 @@ def salva_img(img,path):
             diretorio += paths[i]+"/"
 
         print(f"[ INFO ] Salvando imagem em: {diretorio+path_f}")
-        cv2.imwrite(str(diretorio+path_f), img)
+        cv2.imwrite(str(diretorio+path_f), img) # Salva a imagem
     else:
         new_path = paths.split(".")
         new_path[-2] += ".det"
@@ -87,7 +87,7 @@ imagem = cv2.imread(path) #lendo imagem
 try:
     origem = imagem.copy() #copiando imagem
     print("[ INFO ] Imagem aberta")
-except:
+except: # Caso não caonsiga abrir a imagem o codigo morre
     print("[ INFO ] Imagem não encontrada")
     sys.exit()
     
@@ -124,7 +124,7 @@ for i in range(0, deteccoes.shape[2]):
         face = preprocess_input(face)
         face = np.expand_dims(face, axis=0)
 
-		# passa a iamgem no modelo, para verificar a exixtencia de uma mascara ou não
+		# passa a imagem no modelo, para verificar a exixtencia de uma mascara ou não
         (mask, withoutMask) = modelo.predict(face)[0]
 
         #determinado a label e a cor do quadrado
