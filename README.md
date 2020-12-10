@@ -4,6 +4,12 @@ Sistema feito para detecção facial e reconhecimento se a pessoa esta usando ma
 
 ![Imagem de pessoas com e sem mascaras faciais](https://raw.githubusercontent.com/JN513/mask_detect/master/testes/teste.det.jpg)
 
+
+## Jupyter Notebook
+
+O projeto conta com uma versão em um jupyter notebook no Google colab (Que inclusive foi onde eu treinei o modelo, devido as limitaçãos da minha maquina.), e uma copia do mesmo no repositorio.
+
+👉 Versão no [Google Colab](https://colab.research.google.com/drive/145o1e8Z23aKkgBZT8cpcavjVAc8VHskp?authuser=1)
 ## Requisitos
 
 * Versão 3.0 ou superior do Python (testei na 3.8)
