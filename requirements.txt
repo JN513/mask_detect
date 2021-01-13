@@ -1,4 +1,6 @@
 tensorflow
+tensorflow-gpu
+setuptools
 opencv-python
 numpy
 Cython
@@ -11,3 +13,4 @@ sklearn
 imutils
 matplotlib
 PIL
+black
