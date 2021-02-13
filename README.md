@@ -27,7 +27,7 @@ O projeto conta com uma versão em um jupyter notebook no Google colab (Que incl
 
 ## Instalação
 
-Para instalar todas as Bibliotecas, basta istalar usando o arquivo **requirements.txt**, com o seguinte comando:
+Para instalar todas as Bibliotecas, basta instalar usando o arquivo **requirements.txt**, com o seguinte comando:
 
 ```
 pip3 install -r requirements.txt
