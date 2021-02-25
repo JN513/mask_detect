@@ -18,39 +18,53 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import os
 
-print('[INFO] Carregando imagens ...')
+print("[INFO] Carregando imagens ...")
 
-caminho_imagens = list(paths.list_images('/dataset/')) # Carregando imagens
+caminho_imagens = list(paths.list_images("/dataset/"))  # Carregando imagens
 
-imagens = [] # Lista de imagens
+imagens = []  # Lista de imagens
 labels = []  # Lista de labels
 
-for path in caminho_imagens: # Pegando o label e a imagem e add em listas
+for path in caminho_imagens:  # Pegando o label e a imagem e add em listas
     label = path.split(os.path.sep)[-2]
 
-    imagem = load_img(path, target_size=(224, 224)) # Abrindo e processando as imagens
-    imagem = img_to_array(imagem) # Convertendo a imagem para array
+    imagem = load_img(path, target_size=(224, 224))  # Abrindo e processando as imagens
+    imagem = img_to_array(imagem)  # Convertendo a imagem para array
     imagem = preprocess_input(imagem)
 
-    imagens.append(imagem) # Adicionando imagem a lista de imagens
-    labels.append(label) # Adicionando label a lista de labels
+    imagens.append(imagem)  # Adicionando imagem a lista de imagens
+    labels.append(label)  # Adicionando label a lista de labels
 
 
-imagens = np.array(imagens, dtype='float32') # Transformando as listas em array numpy
+imagens = np.array(imagens, dtype="float32")  # Transformando as listas em array numpy
 labels = np.array(labels)
 
-lb = LabelBinarizer() # Executar codificação one-hot nas etiquetas
+lb = LabelBinarizer()  # Executar codificação one-hot nas etiquetas
 labels = lb.fit_transform(labels)
 labels = to_categorical(labels)
 
 # Particione os dados em divisões de treinamento e teste usando 75% dos dados para treinamento e os 25% restantes para teste
-(trainX, testX, trainY, testY) = train_test_split(imagens, labels, test_size=0.20, stratify=labels, random_state=42)
+(trainX, testX, trainY, testY) = train_test_split(
+    imagens, labels, test_size=0.20, stratify=labels, random_state=42
+)
 
 # Construindo o gerador de imagens de treinamento para aumento de dados
-gerador = ImageDataGenerator(rotation_range=20, zoom_range=0.15, width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15, horizontal_flip=True, fill_mode="nearest")
+gerador = ImageDataGenerator(
+    rotation_range=20,
+    zoom_range=0.15,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.15,
+    horizontal_flip=True,
+    fill_mode="nearest",
+)
 
 # Carregando a rede MobileNetV2, garantindo que os conjuntos de camadas FC principais sejam deixados de lado
-baseModel = MobileNetV2(weights="imagenet", include_top=False, input_tensor=keras.layers.Input(shape=(224, 224, 3)))
+baseModel = MobileNetV2(
+    weights="imagenet",
+    include_top=False,
+    input_tensor=keras.layers.Input(shape=(224, 224, 3)),
+)
 
 # Construindo a cabeça do modelo que será colocado em cima do modelo base
 modelo_cabeca = baseModel.output
@@ -65,12 +79,12 @@ modelo = Model(inputs=baseModel.input, outputs=modelo_cabeca)
 
 # Percorre todas as camadas no modelo base e as congela para que elas * não * sejam atualizadas durante o primeiro processo de treinamento
 for layer in baseModel.layers:
-	  layer.trainable = False
+    layer.trainable = False
 
 # Compilando o modelo
-print('[INFO] compilando modelo ...')
+print("[INFO] compilando modelo ...")
 
-modelo.compile(optimizer='adam', loss='binary_crossentropy',metrics=['accuracy'])
+modelo.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
 
 # Inicialize a taxa de aprendizado inicial, número de épocas para treinamento e tamanho do lote
 inicia_apredizado = 1e-4
@@ -79,7 +93,13 @@ tamanho_lote = 32
 
 # Treinar a cabeça
 print("[INFO] treinando...")
-cabeca = modelo.fit(gerador.flow(trainX, trainY, batch_size=tamanho_lote), steps_per_epoch=len(trainX) // tamanho_lote, validation_data=(testX, testY), validation_steps=len(testX) // tamanho_lote, epochs=quantidade_treinos)
+cabeca = modelo.fit(
+    gerador.flow(trainX, trainY, batch_size=tamanho_lote),
+    steps_per_epoch=len(trainX) // tamanho_lote,
+    validation_data=(testX, testY),
+    validation_steps=len(testX) // tamanho_lote,
+    epochs=quantidade_treinos,
+)
 
 # Fazendo predições na rede neural
 print("[INFO] avaliando a rede neural...")
@@ -88,7 +108,7 @@ predIdxs = modelo.predict(testX, batch_size=tamanho_lote)
 # Para cada imagem no conjunto de testes, precisamos encontrar o índice do rótulo com a maior probabilidade prevista correspondente
 predIdxs = np.argmax(predIdxs, axis=1)
 
-print(classification_report(testY.argmax(axis=1), predIdxs,	target_names=lb.classes_))
+print(classification_report(testY.argmax(axis=1), predIdxs, target_names=lb.classes_))
 
 # Salvando o modelo
 print("[INFO] salvando o modelo...")
