@@ -9,15 +9,15 @@ Sistema feito para detecção facial e reconhecimento se a pessoa esta usando ma
 
 ### Perda e Acurácia
 
-![Perda e Acurácia]()
+![Perda e Acurácia](https://raw.githubusercontent.com/JN513/mask_detect/master/plot.png)
 
 ### Acurácia
 
-![Acurácia]()
+![Acurácia](https://raw.githubusercontent.com/JN513/mask_detect/master/plotloss.png)
 
 ### Perda
 
-![Perda]()
+![Perda](https://raw.githubusercontent.com/JN513/mask_detect/master/plotacc.png)
 
 
 ## Jupyter Notebook
