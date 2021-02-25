@@ -5,6 +5,21 @@ Sistema feito para detecção facial e reconhecimento se a pessoa esta usando ma
 ![Imagem de pessoas com e sem mascaras faciais](https://raw.githubusercontent.com/JN513/mask_detect/master/testes/teste.det.jpg)
 
 
+## Resultados
+
+### Perda e Acurácia
+
+![Perda e Acurácia]()
+
+### Acurácia
+
+![Acurácia]()
+
+### Perda
+
+![Perda]()
+
+
 ## Jupyter Notebook
 
 O projeto conta com uma versão em um jupyter notebook no Google colab (Que inclusive foi onde eu treinei o modelo, devido as limitaçãos da minha maquina.), e uma copia do mesmo no repositorio.
